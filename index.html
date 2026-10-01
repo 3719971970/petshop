@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Patas & Cia - Pet Shop e Loja Online">
+  <meta name="description" content="Patas & amigos
+   - Pet Shop e Loja Online">
   <title>Patas & Cia | Pet Shop</title>
 
   <style>
@@ -2448,3 +2449,65 @@
 
 </body>
 </html>
+function finishOrder(event) {
+  event.preventDefault();
+
+  const form = event.target;
+
+  const nome = form.querySelector('input[placeholder="Seu nome"]').value;
+  const telefone = form.querySelector('input[placeholder="(00) 00000-0000"]').value;
+  const endereco = form.querySelector('input[placeholder="Rua, número"]').value;
+  const cidade = form.querySelector('input[placeholder="Sua cidade"]').value;
+  const cep = form.querySelector('input[placeholder="00000-000"]').value;
+  const pagamento = form.querySelector('select').value;
+
+  let mensagem = `🐾 *NOVO PEDIDO - PATAS & CIA*%0A%0A`;
+
+  mensagem += `👤 *Cliente:* ${nome}%0A`;
+  mensagem += `📱 *Telefone:* ${telefone}%0A`;
+  mensagem += `📍 *Endereço:* ${endereco}%0A`;
+  mensagem += `🏙️ *Cidade:* ${cidade}%0A`;
+  mensagem += `📮 *CEP:* ${cep}%0A`;
+  mensagem += `💳 *Pagamento:* ${pagamento}%0A%0A`;
+
+  mensagem += `🛒 *PRODUTOS:*%0A`;
+
+  let subtotal = 0;
+
+  cart.forEach(item => {
+    const product = products.find(p => p.id === item.id);
+
+    const valor = product.price * item.quantity;
+    subtotal += valor;
+
+    mensagem += `• ${product.name} x${item.quantity} - ${money(valor)}%0A`;
+  });
+
+  const desconto = couponApplied ? subtotal * 0.10 : 0;
+  const depoisDesconto = subtotal - desconto;
+  const frete = depoisDesconto > 0 && depoisDesconto < 149 ? 15 : 0;
+  const total = depoisDesconto + frete;
+
+  mensagem += `%0A`;
+  mensagem += `💰 *Subtotal:* ${money(subtotal)}%0A`;
+  mensagem += `🏷️ *Desconto:* ${money(desconto)}%0A`;
+  mensagem += `🚚 *Frete:* ${frete === 0 ? "GRÁTIS" : money(frete)}%0A`;
+  mensagem += `💵 *TOTAL:* ${money(total)}%0A%0A`;
+  mensagem += `Obrigado pela preferência! 🐶🐱❤️`;
+
+  const numeroWhatsApp = "5581994028275";
+
+  const whatsappURL =
+    `https://wa.me/${numeroWhatsApp}?text=${mensagem}`;
+
+  window.open(whatsappURL, "_blank");
+
+  cart = [];
+  couponApplied = false;
+
+  saveCart();
+  updateCart();
+
+  document.getElementById("checkoutForm").style.display = "none";
+  document.getElementById("successMessage").style.display = "block";
+}
